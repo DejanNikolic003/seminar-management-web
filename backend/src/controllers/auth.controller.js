@@ -9,7 +9,7 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
         
         if(await !doesUserExists(email)) {
-            return res.status(STATUS.CONFLICT).json({ status: "error", message: "Ovaj email ne postoji u bazi podataka!" });
+            return res.status(STATUS.NOT_FOUND).json({ status: "error", message: "Ovaj email ne postoji u bazi podataka!" });
         }
 
         const result = await prisma.user.findFirst({ where: { email } });

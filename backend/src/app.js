@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import * as STATUS from "./constants/statusCodes.js";
 import authRouter from "./routes/auth.router.js";
+import isAuthenticated from "./middlewares/isAuthenticated.js";
+import isAuthorized from "./middlewares/isAuthorized.js";
+import { TEACHER, STUDENT } from "./constants/roles.js";
 
 const app = express();
 
@@ -11,11 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/api/status", (req, res) => {
+// AUTH ROUTES
+app.use("/api/auth", authRouter);
+
+app.get("/api/status", isAuthenticated, isAuthorized(STUDENT), (req, res) => {
     res.status(STATUS.OK).json({ message: "OK" });
 });
 
-// AUTH ROUTES
-app.use("/api/auth", authRouter);
 
 export default app;
