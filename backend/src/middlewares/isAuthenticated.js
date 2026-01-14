@@ -17,7 +17,6 @@ const isAuthenticated = async (req, res, next) => {
             role: result.role
         }
         
-        console.log(req.user);
         next();
     } catch (error) {
         return res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
