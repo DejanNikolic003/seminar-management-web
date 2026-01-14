@@ -78,6 +78,8 @@ export const register = async (req, res) => {
     }
 };
 
+// TODO: REFRESH TOKEN HANDLING
+
 const doesUserExists = async (email) => {
     try {
         const count = await prisma.user.count({ where: { email } });
