@@ -37,7 +37,7 @@ model Subject {
   name      String
   code      String    @unique
   teacherId Int
-  teacher   User      @relation(fields: [teacherId], references: [id])
+  teacher   User     @relation(fields: [teacherId], references: [id])
   seminars  Seminar[]
 }
 
