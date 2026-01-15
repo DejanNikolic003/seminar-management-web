@@ -30,7 +30,7 @@ export const createSubject = async (req, res) => {
             });
         }
 
-        if (!isUserTeacher(teacherId)) {
+        if (!await isUserTeacher(teacherId)) {
             return res.status(STATUS.FORBIDDEN).json({
                 status: "error",
                 message: "Korisnik ne postoji ili nije profesor!",
@@ -58,11 +58,11 @@ export const editSubject = async (req, res) => {
         const id = Number(req.params.id);
         const { name, code, teacherId } = req.body;
 
-        if(!doesSubjectExist(id)) {
+        if(!await doesSubjectExist(id)) {
             return res.status(STATUS.NOT_FOUND).json({ status: "error", message: "Ne postoji predmet sa ovim ID-jem!" });
         }
 
-        if (!isUserTeacher(teacherId)) {
+        if (!await isUserTeacher(teacherId)) {
             return res.status(STATUS.FORBIDDEN).json({
                 status: "error",
                 message: "Korisnik ne postoji ili nije profesor!",
