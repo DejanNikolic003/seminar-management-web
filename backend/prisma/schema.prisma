@@ -24,7 +24,6 @@ model User {
 
   studentSeminars Seminar[] @relation("StudentSeminars")
   teacherSubjects Subject[]
-  teacherTopics   Topic[]
 }
 
 enum Role {
@@ -37,7 +36,8 @@ model Subject {
   name      String
   code      String    @unique
   teacherId Int
-  teacher   User     @relation(fields: [teacherId], references: [id])
+  teacher   User      @relation(fields: [teacherId], references: [id])
+  topics    Topic[]
   seminars  Seminar[]
 }
 
@@ -45,8 +45,8 @@ model Topic {
   id          Int       @id @default(autoincrement())
   title       String
   description String?
-  teacherId   Int
-  teacher     User      @relation(fields: [teacherId], references: [id])
+  subjectId   Int
+  subject     Subject   @relation(fields: [subjectId], references: [id])
   seminars    Seminar[]
 }
 
