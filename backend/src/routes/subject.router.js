@@ -10,6 +10,4 @@ subjectRouter.use(isAuthorized(TEACHER));
 subjectRouter.post("/", createSubject);
 subjectRouter.put("/:id", editSubject);
 subjectRouter.delete("/:id", deleteSubject);
-
-
 export default subjectRouter;

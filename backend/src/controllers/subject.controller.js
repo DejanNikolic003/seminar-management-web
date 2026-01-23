@@ -4,11 +4,17 @@ import { TEACHER } from "../constants/roles.js";
 
 export const getAllSubjects = async (req, res) => {
     try {
-       const result = await prisma.subject.findMany({ include: { teacher: { select: { id: true, firstName: true, lastName: true, email: true } } } });
+        const result = await prisma.subject.findMany({ 
+            include: { 
+                teacher: { 
+                    select: { id: true, firstName: true, lastName: true, email: true } 
+                } 
+            } 
+        });
         
-       res.status(STATUS.OK).json({ status: "success", result });
+        res.status(STATUS.OK).json({ status: "success", data: result });
     } catch (error) {
-       res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
+        res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
     }
 };
 
@@ -16,15 +22,15 @@ export const createSubject = async (req, res) => {
     try {
         const { name, code, teacherId } = req.body;
 
-        if(!name || !code) {
-            return res.status(STATUS.FORBIDDEN).json({
+        if(!name || !code || !teacherId) {
+            return res.status(STATUS.BAD_REQUEST).json({
                 status: "error",
-                message: "Naziv i šifra su obavezni",
+                message: "Naziv, šifra i ID profesora su obavezni",
             });
         }
 
-        if(!await doesSubjectCodeExist(code)) {
-            return res.status(STATUS.FORBIDDEN).json({
+        if(await doesSubjectCodeExist(code)) {
+            return res.status(STATUS.CONFLICT).json({
                 status: "error",
                 message: "Predmet sa ovim kodom već postoji!",
             });
@@ -47,7 +53,7 @@ export const createSubject = async (req, res) => {
             } 
         });
 
-        res.status(STATUS.OK).json({ status: "success", message: "Uspešno ste dodali novi predmet!", newSubject });
+        res.status(STATUS.OK).json({ status: "success", message: "Uspešno ste dodali novi predmet!", data: newSubject });
     } catch (error) {
         res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
     }
@@ -57,6 +63,13 @@ export const editSubject = async (req, res) => {
     try {
         const id = Number(req.params.id);
         const { name, code, teacherId } = req.body;
+
+        if(!name || !code || !teacherId) {
+            return res.status(STATUS.BAD_REQUEST).json({
+                status: "error",
+                message: "Naziv, šifra i ID profesora su obavezni",
+            });
+        }
 
         if(!await doesSubjectExist(id)) {
             return res.status(STATUS.NOT_FOUND).json({ status: "error", message: "Ne postoji predmet sa ovim ID-jem!" });
@@ -69,8 +82,9 @@ export const editSubject = async (req, res) => {
             });
         }
 
-        if(!await doesSubjectCodeExist(code)) {
-            return res.status(STATUS.FORBIDDEN).json({
+        const existingSubject = await prisma.subject.findFirst({ where: { code } });
+        if(existingSubject && existingSubject.id !== id) {
+            return res.status(STATUS.CONFLICT).json({
                 status: "error",
                 message: "Predmet sa ovim kodom već postoji!",
             });
@@ -87,7 +101,7 @@ export const editSubject = async (req, res) => {
             },
         });
 
-        res.status(STATUS.OK).json({ status: "success", message: "Uspešno ste izmenili predmet!", updatedSubject });
+        res.status(STATUS.OK).json({ status: "success", message: "Uspešno ste izmenili predmet!", data: updatedSubject });
     } catch (error) {
         res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
     }
@@ -110,20 +124,20 @@ export const deleteSubject = async (req, res) => {
 };
 
 const doesSubjectCodeExist = async (code) => {
-     try {
+    try {
         const count = await prisma.subject.count({ where: { code } });
         return count > 0;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 };
 
 const doesSubjectExist = async (id) => {
     try {
-        const count = await prisma.subject.count({ where: { code } });
+        const count = await prisma.subject.count({ where: { id } });
         return count > 0;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 };
 
@@ -136,6 +150,6 @@ const isUserTeacher = async (userId) => {
 
         return user?.role === TEACHER;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 };
