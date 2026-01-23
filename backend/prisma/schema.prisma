@@ -52,6 +52,7 @@ model Topic {
 
 model Seminar {
   id          Int           @id @default(autoincrement())
+  fileName String
   title       String
   description String?
   studentId   Int
