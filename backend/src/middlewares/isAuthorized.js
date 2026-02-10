@@ -1,5 +1,6 @@
 import * as STATUS from "../constants/statusCodes.js";
 import * as ROLES from "../constants/roles.js";
+
 const isAuthorized = (role) => {
     return (req, res, next) => {
         if(![ROLES.STUDENT, ROLES.TEACHER].includes(role)) {
