@@ -1,4 +1,4 @@
-import { GraduationCap, KeyRound, LogIn, Mail } from 'lucide-react';
+import { GraduationCap, KeyRound, LogIn, Mail, User } from 'lucide-react';
 
 const Register = () => {
     return (
@@ -10,7 +10,17 @@ const Register = () => {
                 <h1 className="text-xl font-bold text-center mt-10 text-slate-700">Pozdrav,</h1>
                 <p className="text-center text-slate-500 mb-4">Registrujte se u sistem za upravljanje seminara!</p>
                 <form className="px-6 pb-4">
-                    <div className="flex items-center border border-slate-200 rounded-lg mb-4 p-2">
+                    <div className="md:flex gap-2">
+                        <div className="flex items-center border border-slate-200 rounded-lg mb-2 p-2">
+                            <User  className="w-6 h-6 text-slate-500" />
+                            <input type="text" placeholder="Ime" className="ml-2 w-full outline-none text-slate-500 text-sm" />
+                        </div>
+                        <div className="flex items-center border border-slate-200 rounded-lg mb-2 p-2">
+                            <User  className="w-6 h-6 text-slate-500" />
+                            <input type="text" placeholder="Prezime" className="ml-2 w-full outline-none text-slate-500 text-sm" />
+                        </div>
+                    </div>
+                    <div className="flex items-center border border-slate-200 rounded-lg mb-2 p-2">
                         <Mail  className="w-6 h-6 text-slate-500" />
                         <input type="email" placeholder="E-mail adresa" className="ml-2 w-full outline-none text-slate-500 text-sm" />
                     </div>
