@@ -19,4 +19,17 @@ export const register = async (data) => {
         const message = error.response?.data?.message || "Došlo je do greške prilikom registracije!";
         throw new Error(message);
     }
-}
+};
+
+export const refresh = async () => {
+    try {
+        const response = await axios.get("/auth/refresh", {
+          withCredentials: true,
+        });
+
+        return response.data;
+    } catch (error) {
+        const message = error.response?.data?.message || "Došlo je do greške prilikom refresha tokena!";
+        throw new Error(message);
+    }
+};

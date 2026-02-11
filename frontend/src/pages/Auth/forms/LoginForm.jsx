@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { login } from "../../../api/auth";
+import useAuth from "../../../hooks/useAuth";
 import { KeyRound, LogIn, Mail } from "lucide-react";
 import Input from "../../../components/Input";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import axios from "../../../api/axios";
-import { login } from "../../../api/auth";
 
 const LoginForm = () => {
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -14,7 +15,10 @@ const LoginForm = () => {
 
     try {
       const response = await login({ email, password });
-      console.log(response);
+      setUser({
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      });
     } catch (error) {
       console.log(error);
     }

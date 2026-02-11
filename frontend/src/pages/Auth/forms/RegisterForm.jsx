@@ -3,8 +3,10 @@ import { KeyRound, LogIn, Mail, User } from "lucide-react";
 import Input from "../../../components/Input";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import { register } from "../../../api/auth";
+import useAuth from "../../../hooks/useAuth";
 
 const RegisterForm = () => {
+  const { setUser } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,10 +14,12 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const response = await register({ firstName, lastName, email, password });
-      console.log(response);
+      setUser({
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      });
     } catch (error) {
       console.log(error);
     }
