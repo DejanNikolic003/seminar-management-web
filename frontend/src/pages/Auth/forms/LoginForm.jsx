@@ -1,26 +1,30 @@
 import { useState } from "react";
 import { login } from "../../../api/auth";
 import useAuth from "../../../hooks/useAuth";
-import { KeyRound, LogIn, Mail } from "lucide-react";
+import { GraduationCap, KeyRound, LogIn, Mail } from "lucide-react";
 import Input from "../../../components/Input";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const LoginForm = () => {
-  const { setUser } = useAuth();
+  const { setAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await login({ email, password });
-      setUser({
+      setAuth({
         user: response.data.user,
         accessToken: response.data.accessToken,
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,7 +45,7 @@ const LoginForm = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit}>
+      <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit} loading={loading}>
         Prijavi se
       </ButtonWithIcon>
     </form>

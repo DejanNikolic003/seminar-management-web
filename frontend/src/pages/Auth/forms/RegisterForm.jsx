@@ -6,14 +6,16 @@ import { register } from "../../../api/auth";
 import useAuth from "../../../hooks/useAuth";
 
 const RegisterForm = () => {
-  const { auth, setAuth } = useAuth();
+  const { setAuth } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await register({ firstName, lastName, email, password });
       setAuth({
@@ -22,11 +24,9 @@ const RegisterForm = () => {
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const test = () => {
-    console.log(auth?.user);
   };
 
   return (
@@ -62,10 +62,7 @@ const RegisterForm = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit}>
-        Registruj se
-      </ButtonWithIcon>
-      <ButtonWithIcon icon={<LogIn />} onClick={test}>
+      <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit} loading={loading}>
         Registruj se
       </ButtonWithIcon>
     </form>
