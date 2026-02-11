@@ -1,18 +1,62 @@
+import { useState } from "react";
 import { KeyRound, LogIn, Mail, User } from "lucide-react";
 import Input from "../../../components/Input";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
+import { register } from "../../../api/auth";
 
 const RegisterForm = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await register({ firstName, lastName, email, password });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <form className="px-6 pb-4">
       <div className="md:flex gap-2">
-        <Input type={"text"} placeholder={"Ime"} icon={<User />} />
-        <Input type={"text"} placeholder={"Prezime"} icon={<User />} />
+        <Input
+          type={"text"}
+          placeholder={"Ime"}
+          icon={<User />}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <Input
+          type={"text"}
+          placeholder={"Prezime"}
+          icon={<User />}
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
       </div>
-      <Input type={"email"} placeholder={"E-mail adresa"} icon={<Mail />} />
-      <Input type={"password"} placeholder={"Lozinka"} icon={<KeyRound />} />
+      <Input
+        type={"email"}
+        placeholder={"E-mail adresa"}
+        icon={<Mail />}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <Input
+        type={"password"}
+        placeholder={"Lozinka"}
+        icon={<KeyRound />}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-      <ButtonWithIcon icon={<LogIn />}>Registruj se</ButtonWithIcon>
+      <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit}>
+        Registruj se
+      </ButtonWithIcon>
     </form>
   );
 };
