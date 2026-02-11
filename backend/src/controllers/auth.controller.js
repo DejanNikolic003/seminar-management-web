@@ -113,16 +113,12 @@ export const register = async (req, res) => {
     }
 };
 
-// TODO: REFRESH TOKEN HANDLING
 export const refresh = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
 
         if(!refreshToken) {
-            return res.status(STATUS.UNAUTHORIZED).json({ 
-                status: "error", 
-                message: "Refresh token nije pronađen!" 
-            });
+            return res.status(STATUS.OK).json({ user: null, accessToken: null });
         }
 
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -141,7 +137,6 @@ export const refresh = async (req, res) => {
             data: { user, accessToken } 
         });
     } catch (error) {
-        console.log(error);
         res.status(STATUS.FORBIDDEN).json({ status: "error", message: "Refresh token nije validan!" });
     }
 };
