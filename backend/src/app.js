@@ -9,10 +9,17 @@ import seminarRouter from "./routes/seminar.router.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use("/api/status", (req, res) => {
+    res.status(200).json({ message: "API is running" });
+});
 
 // AUTH ROUTES
 app.use("/api/auth", authRouter);
