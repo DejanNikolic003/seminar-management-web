@@ -6,7 +6,7 @@ import { register } from "../../../api/auth";
 import useAuth from "../../../hooks/useAuth";
 
 const RegisterForm = () => {
-  const { setUser } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,13 +16,17 @@ const RegisterForm = () => {
     e.preventDefault();
     try {
       const response = await register({ firstName, lastName, email, password });
-      setUser({
+      setAuth({
         user: response.data.user,
         accessToken: response.data.accessToken,
       });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const test = () => {
+    console.log(auth?.user);
   };
 
   return (
@@ -59,6 +63,9 @@ const RegisterForm = () => {
       />
 
       <ButtonWithIcon icon={<LogIn />} onClick={handleSubmit}>
+        Registruj se
+      </ButtonWithIcon>
+      <ButtonWithIcon icon={<LogIn />} onClick={test}>
         Registruj se
       </ButtonWithIcon>
     </form>
