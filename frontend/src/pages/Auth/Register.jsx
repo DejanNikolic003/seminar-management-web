@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { GraduationCap, KeyRound, LogIn, Mail, User } from "lucide-react";
 import RegisterForm from "./forms/RegisterForm";
 
@@ -19,12 +20,12 @@ const Register = () => {
 
         <p className="text-center text-slate-500 text-sm mb-4 leading-relaxed">
           Imate nalog?{" "}
-          <a
-            href="/login"
+          <Link
+            to="/auth/login"
             className="text-cyan-500 underline hover:text-cyan-600"
           >
             Prijavite se
-          </a>
+          </Link>
         </p>
       </div>
     </div>
