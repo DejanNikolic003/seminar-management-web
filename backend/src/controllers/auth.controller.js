@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import * as STATUS from "../constants/statusCodes.js";
 import { generateToken } from "../utils/token.js";
 import { REFRESH_TOKEN } from "../constants/token.js";
+import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
     try {
@@ -113,6 +114,39 @@ export const register = async (req, res) => {
 };
 
 // TODO: REFRESH TOKEN HANDLING
+export const refresh = async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if(!refreshToken) {
+            return res.status(STATUS.UNAUTHORIZED).json({ 
+                status: "error", 
+                message: "Refresh token nije pronađen!" 
+            });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const result = await prisma.user.findFirst({ where: { id: decoded._id } });
+        const accessToken = generateToken({ _id: decoded._id });
+
+        const user = {
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            role: result.role
+        };
+
+        res.status(STATUS.OK).json({ 
+            status: "success", 
+            data: { user, accessToken } 
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(STATUS.FORBIDDEN).json({ status: "error", message: "Refresh token nije validan!" });
+    }
+};
+
+
 
 const doesUserExists = async (email) => {
     try {
