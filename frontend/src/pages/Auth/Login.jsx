@@ -1,5 +1,6 @@
 import { GraduationCap } from "lucide-react";
 import LoginForm from "./forms/LoginForm";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -19,12 +20,12 @@ const Login = () => {
 
         <p className="text-center text-slate-500 text-sm mb-4 leading-relaxed">
           Nemate nalog?{" "}
-          <a
-            href="/register"
+          <Link
+            to="/auth/register"
             className="text-cyan-500 underline hover:text-cyan-600"
           >
             Registrujte se
-          </a>
+          </Link>
         </p>
       </div>
     </div>
