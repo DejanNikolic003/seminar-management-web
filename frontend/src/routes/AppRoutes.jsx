@@ -6,6 +6,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import useAuth from "../hooks/useAuth";
 import FullScreenLoader from "../components/FullScreenLoader";
+import MainLayout from "../components/layouts/MainLayout";
 
 const AppRoutes = () => {
   const { loading } = useAuth();
@@ -23,8 +24,8 @@ const AppRoutes = () => {
         </Route>
       </Route>
 
-      <Route element={<Layout />}>
-        <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
           <Route path="/" element={<h1>Home</h1>} />
         </Route>
       </Route>

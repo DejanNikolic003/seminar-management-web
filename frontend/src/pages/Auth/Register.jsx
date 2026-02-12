@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, KeyRound, LogIn, Mail, User } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import RegisterForm from "./forms/RegisterForm";
 
 const Register = () => {

@@ -2,28 +2,31 @@ import { useState } from "react";
 import { KeyRound, LogIn, Mail, User } from "lucide-react";
 import Input from "../../../components/Input";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import { register } from "../../../api/auth";
+import Alert from "../../../components/Alert";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 
 const RegisterForm = () => {
-  const { setAuth } = useAuth();
+  const { register } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({});
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const response = await register({ firstName, lastName, email, password });
-      setAuth({
-        user: response.data.user,
-        accessToken: response.data.accessToken,
-      });
+      await register({ firstName, lastName, email, password });
+      console.log("Registration successful");
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      setError({ message: error.message });
     } finally {
       setLoading(false);
     }
@@ -31,6 +34,8 @@ const RegisterForm = () => {
 
   return (
     <form className="px-6 pb-4">
+      {error.message && <Alert type="error">{error.message}</Alert>}
+
       <div className="md:flex gap-2">
         <Input
           type={"text"}
