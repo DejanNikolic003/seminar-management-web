@@ -1,4 +1,4 @@
-import { GraduationCap, Loader } from "lucide-react";
+import Loader from "./Loader";
 
 const ButtonWithIcon = ({ children, icon, onClick, loading }) => {
   return (
