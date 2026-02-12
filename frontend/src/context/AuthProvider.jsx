@@ -11,15 +11,75 @@ const AuthProvider = ({ children }) => {
     return auth?.user?.role?.trim() === role.trim();
   };
 
+  const login = async (data) => {
+    try {
+      const { data: response } = await axios.post("/auth/login", data);
+
+      setAuth({
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      });
+
+      return { status: response.status, message: response.message };
+    } catch (error) {
+      const message =
+        error.response?.message || "Došlo je do greške prilikom prijave!";
+      throw new Error(message);
+    }
+  };
+
+  const register = async (data) => {
+    try {
+      const { data: response } = await axios.post("/auth/register", data);
+
+      setAuth({
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      });
+
+      return { status: response.status, message: response.message };
+    } catch (error) {
+      const message =
+        error.response?.message || "Došlo je do greške prilikom registracije!";
+      throw new Error(message);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const { data: response } = await axiosPrivate.post("/auth/logout");
+
+      setAuth({});
+      return { status: response.status, message: response.message };
+    } catch (error) {
+      const message =
+        error.response?.message || "Došlo je do greške prilikom odjave!";
+      throw new Error(message);
+    }
+  };
+
+  const refresh = async () => {
+    try {
+      const { data: response } = await axios.get("/auth/refresh", {
+        withCredentials: true,
+      });
+
+      setAuth({
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      });
+    } catch (error) {
+      const message =
+        error.response?.message ||
+        "Došlo je do greške prilikom refresha tokena!";
+      throw new Error(message);
+    }
+  };
+
   useEffect(() => {
     const refreshToken = async () => {
       try {
         const response = await refresh();
-
-        setAuth({
-          user: response.data.user,
-          accessToken: response.data.accessToken,
-        });
       } catch (error) {
         setAuth({});
       } finally {
@@ -30,7 +90,17 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, hasRole, loading }}>
+    <AuthContext.Provider
+      value={{
+        auth,
+        setAuth,
+        hasRole,
+        loading,
+        login,
+        register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
