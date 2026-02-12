@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "../api/axios";
-import { refresh } from "../api/auth";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -23,7 +22,7 @@ const AuthProvider = ({ children }) => {
       return { status: response.status, message: response.message };
     } catch (error) {
       const message =
-        error.response?.message || "Došlo je do greške prilikom prijave!";
+        error.response?.data?.message || "Došlo je do greške prilikom prijave!";
       throw new Error(message);
     }
   };
@@ -40,7 +39,8 @@ const AuthProvider = ({ children }) => {
       return { status: response.status, message: response.message };
     } catch (error) {
       const message =
-        error.response?.message || "Došlo je do greške prilikom registracije!";
+        error.response?.data?.message ||
+        "Došlo je do greške prilikom registracije!";
       throw new Error(message);
     }
   };
@@ -53,7 +53,7 @@ const AuthProvider = ({ children }) => {
       return { status: response.status, message: response.message };
     } catch (error) {
       const message =
-        error.response?.message || "Došlo je do greške prilikom odjave!";
+        error.response?.data?.message || "Došlo je do greške prilikom odjave!";
       throw new Error(message);
     }
   };
@@ -70,7 +70,7 @@ const AuthProvider = ({ children }) => {
       });
     } catch (error) {
       const message =
-        error.response?.message ||
+        error.response?.data?.message ||
         "Došlo je do greške prilikom refresha tokena!";
       throw new Error(message);
     }
@@ -79,7 +79,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const response = await refresh();
+        await refresh();
       } catch (error) {
         setAuth({});
       } finally {
