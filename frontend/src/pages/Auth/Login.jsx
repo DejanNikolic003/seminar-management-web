@@ -1,7 +1,6 @@
 import { GraduationCap } from "lucide-react";
 import LoginForm from "./forms/LoginForm";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
   return (
