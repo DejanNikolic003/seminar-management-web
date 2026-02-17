@@ -2,22 +2,19 @@ import { LogOut } from "lucide-react";
 import Item from "./Item";
 import useAuth from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../../api/auth";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Footer = ({ isOpen }) => {
-  const { setAuth } = useAuth();
+  const { logout } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
   const handleClick = async () => {
     try {
-      const response = await logout();
-      console.log(response);
+      await logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      setAuth({});
       navigate("/auth/login");
     }
   };
