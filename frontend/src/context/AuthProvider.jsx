@@ -48,7 +48,6 @@ const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       const { data: response } = await axiosPrivate.post("/auth/logout");
-
       setAuth({});
       return { status: response.status, message: response.message };
     } catch (error) {
