@@ -1,15 +1,18 @@
 import {
   ChevronsLeftRight,
   GraduationCap,
+  Home,
   LogOut,
   Settings,
 } from "lucide-react";
 import { useState } from "react";
 import Item from "./Item";
 import Footer from "./Footer";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const navigate = useNavigate();
   return (
     <aside
       className={`${isOpen ? "w-64" : "w-18"} relative bg-white border-r border-slate-200 h-screen transition-all duration-300 flex flex-col shadow-xs`}
@@ -43,7 +46,18 @@ const Sidebar = () => {
       </div>
       <div className="line w-full h-px bg-slate-200"></div>
       <div className="border-slate-200 flex-1 flex flex-col justify-between">
-        <nav></nav>
+        <nav>
+          <NavLink to="/">
+            {({ isActive }) => (
+              <Item 
+                icon={<Home />}
+                label="Početna"
+                isOpen={isOpen}
+                active={isActive}
+              />
+            )}
+          </NavLink>
+        </nav>
 
         <Footer isOpen={isOpen} />
       </div>
