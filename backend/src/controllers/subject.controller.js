@@ -123,6 +123,120 @@ export const deleteSubject = async (req, res) => {
     }
 };
 
+export const addUserToSubject = async (req, res) => {
+    try {
+        const subjectId = Number(req.params.subjectId);
+        const { userId } = req.body;
+        const teacherId = req.user.id;
+
+        if (!userId) {
+            return res.status(STATUS.BAD_REQUEST).json({
+                status: "error",
+                message: "ID korisnika je obavezan!",
+            });
+        }
+
+        const subject = await prisma.subject.findUnique({
+            where: { id: subjectId },
+            select: { id: true, teacherId: true },
+        });
+
+        if (!subject) {
+            return res.status(STATUS.NOT_FOUND).json({
+                status: "error",
+                message: "Predmet ne postoji!",
+            });
+        }
+
+        if (subject.teacherId !== teacherId) {
+            return res.status(STATUS.FORBIDDEN).json({
+                status: "error",
+                message: "Nemate dozvolu da dodajete korisnike u ovaj predmet!",
+            });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: Number(userId) },
+            select: { id: true, role: true },
+        });
+
+        if (!user) {
+            return res.status(STATUS.NOT_FOUND).json({
+                status: "error",
+                message: "Korisnik ne postoji!",
+            });
+        }
+
+        if (user.role !== "STUDENT") {
+            return res.status(STATUS.BAD_REQUEST).json({
+                status: "error",
+                message: "Samo studente možete dodati u predmet!",
+            });
+        }
+
+        const existing = await prisma.subjectEnrollment.findUnique({
+            where: {
+                userId_subjectId: { userId: Number(userId), subjectId },
+            },
+        });
+
+        if (existing) {
+            return res.status(STATUS.CONFLICT).json({
+                status: "error",
+                message: "Korisnik je već dodat u ovaj predmet!",
+            });
+        }
+
+        const enrollment = await prisma.subjectEnrollment.create({
+            data: {
+                userId: Number(userId),
+                subjectId,
+            },
+            include: {
+                user: {
+                    select: { id: true, firstName: true, lastName: true, email: true },
+                },
+            },
+        });
+
+        res.status(STATUS.OK).json({
+            status: "success",
+            message: "Uspešno ste dodali korisnika u predmet!",
+            data: enrollment,
+        });
+    } catch (error) {
+        res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
+    }
+};
+
+export const getUserSubjects = async (req, res) => {
+    try {
+        const { id } = req.user;
+        let subjects = [];
+
+        const enrollments = await prisma.subjectEnrollment.findMany({
+                where: { userId: id },
+                include: {
+                    subject: {
+                        include: {
+                            teacher: {
+                                select: { id: true, firstName: true, lastName: true, email: true },
+                            },
+                        },
+                    },
+                },
+            });
+        subjects = enrollments.map((e) => e.subject);
+            
+        res.status(STATUS.OK).json({
+            status: "success",
+            data: subjects,
+        });
+    } catch (error) {
+        res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
+    }
+};
+
 const doesSubjectCodeExist = async (code) => {
     try {
         const count = await prisma.subject.count({ where: { code } });
