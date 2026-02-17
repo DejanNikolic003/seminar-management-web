@@ -9,6 +9,7 @@ import { useState } from "react";
 import Item from "./Item";
 import Footer from "./Footer";
 import { NavLink, useNavigate } from "react-router-dom";
+import Items from "./Items";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -46,19 +47,7 @@ const Sidebar = () => {
       </div>
       <div className="line w-full h-px bg-slate-200"></div>
       <div className="border-slate-200 flex-1 flex flex-col justify-between">
-        <nav>
-          <NavLink to="/">
-            {({ isActive }) => (
-              <Item 
-                icon={<Home />}
-                label="Početna"
-                isOpen={isOpen}
-                active={isActive}
-              />
-            )}
-          </NavLink>
-        </nav>
-
+        <Items isOpen={isOpen} />
         <Footer isOpen={isOpen} />
       </div>
     </aside>
