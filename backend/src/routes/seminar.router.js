@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { deleteSeminar, createSeminar, editSeminar, getAllSeminars } from "../controllers/seminar.controller.js";
+import { deleteSeminar, createSeminar, editSeminar, getAllSeminars, getSeminarCountByStatus } from "../controllers/seminar.controller.js";
 
 const seminarRouter = Router();
 
@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 seminarRouter.get("/", getAllSeminars);
+seminarRouter.get("/count", getSeminarCountByStatus);
 seminarRouter.post("/", upload.single("file"), createSeminar);
 seminarRouter.put("/:id", upload.single("file"), editSeminar);
 seminarRouter.delete("/:id", deleteSeminar);
