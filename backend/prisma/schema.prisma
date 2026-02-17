@@ -22,8 +22,9 @@ model User {
   role      Role     @default(STUDENT)
   createdAt DateTime @default(now())
 
-  studentSeminars Seminar[] @relation("StudentSeminars")
-  teacherSubjects Subject[]
+  studentSeminars     Seminar[]           @relation("StudentSeminars")
+  teacherSubjects     Subject[]
+  subjectEnrollments  SubjectEnrollment[]
 }
 
 enum Role {
@@ -39,6 +40,18 @@ model Subject {
   teacher   User      @relation(fields: [teacherId], references: [id])
   topics    Topic[]
   seminars  Seminar[]
+  enrollments SubjectEnrollment[]
+}
+
+model SubjectEnrollment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  subjectId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, subjectId])
 }
 
 model Topic {
@@ -52,7 +65,7 @@ model Topic {
 
 model Seminar {
   id          Int           @id @default(autoincrement())
-  fileName String
+  fileName    String        @default("")
   title       String
   description String?
   studentId   Int
