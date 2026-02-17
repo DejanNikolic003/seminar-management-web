@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "../api/axios";
+import axios, { axiosPrivate } from "../api/axios";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -48,10 +48,10 @@ const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       const { data: response } = await axiosPrivate.post("/auth/logout");
-
       setAuth({});
       return { status: response.status, message: response.message };
     } catch (error) {
+      console.log(error);
       const message =
         error.response?.data?.message || "Došlo je do greške prilikom odjave!";
       throw new Error(message);

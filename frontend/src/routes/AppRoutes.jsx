@@ -7,6 +7,7 @@ import GuestRoute from "./GuestRoute";
 import useAuth from "../hooks/useAuth";
 import FullScreenLoader from "../components/FullScreenLoader";
 import MainLayout from "../components/layouts/MainLayout";
+import Dashboard from "../pages/dashboard/Dashboard";
 
 const AppRoutes = () => {
   const { loading } = useAuth();
@@ -26,7 +27,7 @@ const AppRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<h1>Home</h1>} />
+          <Route path="/" element={<Dashboard />} />
         </Route>
       </Route>
 

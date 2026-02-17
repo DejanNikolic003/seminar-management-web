@@ -322,3 +322,14 @@ export const deleteSeminar = async (req, res) => {
         res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
     }
 };    
+
+export const getSeminarCountByStatus = async (req, res) => {
+    try {
+    const counts = await prisma.seminar.groupBy({by: ["status"], _count: { status: true, }, });
+    const result = counts.map((item) => ({ type: item.status, count: item._count.status }) );
+
+    res.status(STATUS.OK).json({ status: "success", data: result });
+    } catch (error) {
+       res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message }); 
+    }
+}

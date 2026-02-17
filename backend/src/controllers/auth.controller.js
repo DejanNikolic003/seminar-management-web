@@ -113,6 +113,22 @@ export const register = async (req, res) => {
     }
 };
 
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie("refreshToken", { 
+            httpOnly: true, 
+            sameSite: 'Strict',
+        });
+
+        res.status(STATUS.OK).json({ 
+            status: "success", 
+            message: "Uspešno ste se odjavili!" 
+        });
+    } catch (error) {
+        res.status(STATUS.INTERNAL_ERROR).json({ status: "error", message: error.message });
+    }
+};
+
 export const refresh = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
