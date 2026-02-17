@@ -22,17 +22,12 @@ const Footer = ({ isOpen }) => {
   return (
     <div>
       <div className="line w-full h-px bg-slate-200"></div>
-      <div
-        className={`py-2
-  ${isOpen ? "px-2" : "flex justify-center"}`}
-      >
         <Item
           icon={<LogOut />}
           label="Odjava"
           isOpen={isOpen}
           onClick={handleClick}
         />
-      </div>
     </div>
   );
 };
