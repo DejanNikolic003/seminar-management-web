@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model users {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  first_name String
+  last_name  String
+  email      String   @unique
+  role       Role
+  created_at DateTime @default(now())
+
+  seminars   seminars[]
+  enrollments subject_enrollments[]
+}
+
+model subjects {
+  id    Int     @id @default(autoincrement())
+  name  String
+  code  String  @unique
+
+  seminars    seminars[]
+  enrollments subject_enrollments[]
+}
+
+model topics {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  seminars seminars[]
+}
+
+model seminars {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  subject_id Int
+  topic_id   Int
+  file_path  String?
+  status     SeminarStatus
+  created_at DateTime @default(now())
+
+  user    users    @relation(fields: [user_id], references: [id])
+  subject subjects @relation(fields: [subject_id], references: [id])
+  topic   topics   @relation(fields: [topic_id], references: [id])
+}
+
+model subject_enrollments {
+  user_id    Int
+  subject_id Int
+
+  user    users    @relation(fields: [user_id], references: [id])
+  subject subjects @relation(fields: [subject_id], references: [id])
+
+  @@id([user_id, subject_id])
+}
+
+enum Role {
+  ADMIN
+  PROFESSOR
+  STUDENT
+}
+
+enum SeminarStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  DEFENDED
+}
