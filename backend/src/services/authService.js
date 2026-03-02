@@ -1,7 +1,7 @@
 import { prisma } from "../config/prismaClient.js";
 import bcrypt from "bcrypt";
 
-export const createUser = async (email, password, firstName, lastName) => {
+const createUser = async (email, password, firstName, lastName) => {
     try {
         const exists = await doesUserExists(email);
 
@@ -26,7 +26,7 @@ export const createUser = async (email, password, firstName, lastName) => {
     }
 };
 
-export const getUserByEmail = async (email) => {
+const getUserByEmail = async (email) => {
     try {
         const exists = await doesUserExists(email);
 
@@ -54,3 +54,5 @@ const doesUserExists = async (email) => {
     throw error;
   }
 }
+
+export { createUser, getUserByEmail };
