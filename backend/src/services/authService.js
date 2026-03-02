@@ -1,4 +1,6 @@
 import { prisma } from "../config/prismaClient.js";
+import { PROFESSOR } from "../constants/roles.js";
+
 import bcrypt from "bcrypt";
 
 const createUser = async (email, password, firstName, lastName) => {
@@ -54,5 +56,11 @@ const doesUserExists = async (email) => {
     throw error;
   }
 }
+const doesUserExistsById = async (userId) => {
+    const user = await prisma.users.findUnique({ where: { id: userId } });
+    return user || null;
+};
 
-export { createUser, getUserByEmail };
+const isProfessor = (user) => user?.role === PROFESSOR;
+
+export { createUser, getUserByEmail, doesUserExistsById, isProfessor };
