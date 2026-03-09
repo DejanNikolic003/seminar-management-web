@@ -18,22 +18,28 @@ model users {
 
   seminars   seminars[]
   enrollments subject_enrollments[]
+  subjects     subjects[] @relation("ProfessorSubjects") 
 }
 
 model subjects {
   id    Int     @id @default(autoincrement())
   name  String
   code  String  @unique
-
+  professor_id Int
+  
   seminars    seminars[]
   enrollments subject_enrollments[]
+  professor   users   @relation("ProfessorSubjects", fields: [professor_id], references: [id])
+  topics      topics[]
 }
 
 model topics {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
+  subject_id  Int
 
+  subject subjects @relation(fields: [subject_id], references: [id])
   seminars seminars[]
 }
 
