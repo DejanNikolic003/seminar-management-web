@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import isAuthenticated from "./middleware/isAuthenticated.js";
 import authRouter from "./routes/authRoutes.js";
 import subjectRouter from "./routes/subjectRoutes.js";
@@ -7,6 +8,10 @@ import seminarRouter from "./routes/seminarRoutes.js";
 import enrollmentRouter from "./routes/enrollmentRoutes.js";
 
 const app = express();
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
