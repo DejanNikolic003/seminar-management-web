@@ -2,6 +2,8 @@ import { prisma } from "../config/prismaClient.js";
 import { PROFESSOR } from "../constants/roles.js";
 
 import bcrypt from "bcrypt";
+import {generateTokenPair} from "./tokenService.js";
+import jwt from "jsonwebtoken";
 
 const createUser = async (email, password, firstName, lastName) => {
     try {
@@ -56,6 +58,31 @@ const doesUserExists = async (email) => {
     throw error;
   }
 }
+
+const verifyToken = async (token) => {
+    try {
+        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        const user = await doesUserExistsById(decoded.id);
+
+        if(!user) {
+            throw new Error("Korisnik ne postoji!");
+        }
+
+        const userData = {
+            id: user.id,
+            email: user.email,
+            fullName: user.first_name + " " + user.last_name,
+            role: user.role
+        };
+
+        const { accessToken } = generateTokenPair(userData);
+
+        return { accessToken, userData };
+    } catch (error) {
+        throw error;
+    }
+};
+
 const doesUserExistsById = async (userId) => {
     const user = await prisma.users.findUnique({ where: { id: userId } });
     return user || null;
@@ -63,4 +90,4 @@ const doesUserExistsById = async (userId) => {
 
 const isProfessor = (user) => user?.role === PROFESSOR;
 
-export { createUser, getUserByEmail, doesUserExistsById, isProfessor };
+export { createUser, getUserByEmail, verifyToken, doesUserExistsById, isProfessor };

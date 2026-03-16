@@ -8,13 +8,13 @@ export const login = async (req, res) => {
       const user = await service.getUserByEmail(email);
 
       if(!user) {
-        return res.status(404).json({ message: "Ne postoji korisnik!" });
+        return res.status(404).json({ status: "error", message: "Ne postoji korisnik!" });
       }
 
       const doesPasswordsMatch = bcrypt.compare(password, user.password);
 
       if(!doesPasswordsMatch) {
-        return res.status(400).json({ message: "Uneta lozinka je pogrešna!" });
+        return res.status(400).json({ status: "error", message: "Uneta lozinka je pogrešna!" });
       }
 
       const userData = {
@@ -32,9 +32,9 @@ export const login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000 
       });
 
-      return res.status(200).json({ user: userData, token: accessToken });
+      return res.status(200).json({ status: "success", user: userData, token: accessToken });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ status: "error", message: error.message });
     }
 };
 export const register = async (req, res) => {
@@ -57,8 +57,55 @@ export const register = async (req, res) => {
               maxAge: 24 * 60 * 60 * 1000 
         });
 
-        return res.status(200).json({ user: userData, token: accessToken });
+        return res.status(200).json({ status: "success", user: userData, token: accessToken });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ status: "error", message: error.message });
     }
 };
+
+export const refresh = async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if(!refreshToken) {
+            return res.status(200).json({ user: null, accessToken: null });
+        }
+
+        const { accessToken, userData } = await service.verifyToken(refreshToken);
+
+        return res.status(200).json({ status: "success", user: userData, token: accessToken });
+    } catch (error) {
+        return res.status(500).json({ status: "error", message: error.message });
+    }
+};
+
+
+//
+// export const refresh = async (req, res) => {
+//     try {
+//         const { refreshToken } = req.cookies;
+//
+//         if(!refreshToken) {
+//             return res.status(200).json({ user: null, accessToken: null });
+//         }
+//
+//         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+//         const result = await prisma.user.findFirst({ where: { id: decoded._id } });
+//         const accessToken = generateToken({ _id: decoded._id });
+//
+//         const user = {
+//             firstName: result.firstName,
+//             lastName: result.lastName,
+//             email: result.email,
+//             role: result.role
+//         };
+//
+//         res.status(STATUS.OK).json({
+//             status: "success",
+//             data: { user, accessToken }
+//         });
+//     } catch (error) {
+//         res.status(STATUS.FORBIDDEN).json({ status: "error", message: "Refresh token nije validan!" });
+//     }
+// };
+//
