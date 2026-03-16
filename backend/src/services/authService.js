@@ -1,9 +1,9 @@
 import { prisma } from "../config/prismaClient.js";
-import { PROFESSOR } from "../constants/roles.js";
-
 import bcrypt from "bcrypt";
-import {generateTokenPair} from "./tokenService.js";
 import jwt from "jsonwebtoken";
+import { generateAccessToken } from "./tokenService.js";
+import { PROFESSOR } from "../constants/roles.js";
+import { REFRESH_TOKEN } from "../constants/token.js";
 
 const createUser = async (email, password, firstName, lastName) => {
     try {
@@ -61,7 +61,7 @@ const doesUserExists = async (email) => {
 
 const verifyToken = async (token) => {
     try {
-        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        const decoded = jwt.verify(token, REFRESH_TOKEN);
         const user = await doesUserExistsById(decoded.id);
 
         if(!user) {
@@ -75,7 +75,7 @@ const verifyToken = async (token) => {
             role: user.role
         };
 
-        const { accessToken } = generateTokenPair(userData);
+        const accessToken = generateAccessToken(userData);
 
         return { accessToken, userData };
     } catch (error) {
