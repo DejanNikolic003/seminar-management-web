@@ -78,34 +78,3 @@ export const refresh = async (req, res) => {
         return res.status(500).json({ status: "error", message: error.message });
     }
 };
-
-
-//
-// export const refresh = async (req, res) => {
-//     try {
-//         const { refreshToken } = req.cookies;
-//
-//         if(!refreshToken) {
-//             return res.status(200).json({ user: null, accessToken: null });
-//         }
-//
-//         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-//         const result = await prisma.user.findFirst({ where: { id: decoded._id } });
-//         const accessToken = generateToken({ _id: decoded._id });
-//
-//         const user = {
-//             firstName: result.firstName,
-//             lastName: result.lastName,
-//             email: result.email,
-//             role: result.role
-//         };
-//
-//         res.status(STATUS.OK).json({
-//             status: "success",
-//             data: { user, accessToken }
-//         });
-//     } catch (error) {
-//         res.status(STATUS.FORBIDDEN).json({ status: "error", message: "Refresh token nije validan!" });
-//     }
-// };
-//
