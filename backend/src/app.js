@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import isAuthenticated from "./middleware/isAuthenticated.js";
 import authRouter from "./routes/authRoutes.js";
 import subjectRouter from "./routes/subjectRoutes.js";
@@ -14,6 +15,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use(isAuthenticated);
