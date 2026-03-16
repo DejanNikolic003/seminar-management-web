@@ -32,7 +32,7 @@ export const login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000 
       });
 
-      return res.status(200).json({ status: "success", user: userData, token: accessToken });
+      return res.status(200).json({ status: "success", message: "Uspešno ste se prijavili!",  user: userData, token: accessToken });
     } catch (error) {
         return res.status(500).json({ status: "error", message: error.message });
     }
@@ -57,7 +57,7 @@ export const register = async (req, res) => {
               maxAge: 24 * 60 * 60 * 1000 
         });
 
-        return res.status(200).json({ status: "success", user: userData, token: accessToken });
+        return res.status(200).json({ status: "success", message: "Uspešno ste registrovali!", user: userData, token: accessToken });
     } catch (error) {
         return res.status(500).json({ status: "error", message: error.message });
     }
@@ -73,7 +73,7 @@ export const refresh = async (req, res) => {
 
         const { accessToken, userData } = await service.verifyToken(refreshToken);
 
-        return res.status(200).json({ status: "success", user: userData, token: accessToken });
+        return res.status(200).json({ user: userData, token: accessToken });
     } catch (error) {
         return res.status(500).json({ status: "error", message: error.message });
     }
