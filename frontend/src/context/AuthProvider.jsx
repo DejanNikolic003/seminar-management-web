@@ -15,14 +15,14 @@ const AuthProvider = ({ children }) => {
             const { data: response } = await axios.post("/auth/login", data);
 
             setAuth({
-                user: response.user,
-                accessToken: response.token,
+                user: response.data.user,
+                accessToken: response.data.accessToken,
             });
 
             return { status: response.status, message: response.message };
         } catch (error) {
             const message =
-                error.response?.message || "Došlo je do greške prilikom prijave!";
+                error.response?.data?.message || "Došlo je do greške prilikom prijave!";
             throw new Error(message);
         }
     };
@@ -30,15 +30,16 @@ const AuthProvider = ({ children }) => {
     const register = async (data) => {
         try {
             const { data: response } = await axios.post("/auth/register", data);
+
             setAuth({
-                user: response.user,
-                accessToken: response.token,
+                user: response.data.user,
+                accessToken: response.data.accessToken,
             });
 
             return { status: response.status, message: response.message };
         } catch (error) {
             const message =
-                error.response?.message ||
+                error.response?.data?.message ||
                 "Došlo je do greške prilikom registracije!";
             throw new Error(message);
         }
@@ -52,7 +53,7 @@ const AuthProvider = ({ children }) => {
         } catch (error) {
             console.log(error);
             const message =
-                error.response?.message || "Došlo je do greške prilikom odjave!";
+                error.response?.data?.message || "Došlo je do greške prilikom odjave!";
             throw new Error(message);
         }
     };
@@ -65,11 +66,11 @@ const AuthProvider = ({ children }) => {
 
             setAuth({
                 user: response.data.user,
-                accessToken: response.token,
+                accessToken: response.data.accessToken,
             });
         } catch (error) {
             const message =
-                error.response?.message ||
+                error.response?.data?.message ||
                 "Došlo je do greške prilikom refresha tokena!";
             throw new Error(message);
         }
