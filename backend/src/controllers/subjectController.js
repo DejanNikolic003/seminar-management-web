@@ -29,4 +29,25 @@ const getAllSubjects = async (req, res) => {
     }
 };
 
-export { createSubject, getAllSubjects };
+const getSubjectById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const subject = await service.getSubjectById(Number(id));
+        if (!subject) return res.status(404).json({ message: "Predmet nije pronađen!" });
+        
+        const mappedSubject = {
+            id: subject.id,
+            name: subject.name,
+            code: subject.code,
+            professor: {
+                first_name: subject.professor.first_name,
+                last_name: subject.professor.last_name
+            }
+        };
+        return res.status(200).json({ subject: mappedSubject });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }  
+};
+
+export { createSubject, getAllSubjects, getSubjectById };
