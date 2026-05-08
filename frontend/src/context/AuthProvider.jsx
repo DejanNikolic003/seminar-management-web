@@ -3,11 +3,14 @@ import axios, { axiosPrivate } from "../api/api.js";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [auth, setAuth] = useState(null);
+    const [auth, setAuth] = useState({
+        user: null,
+        accessToken: null,
+    });
     const [loading, setLoading] = useState(true);
 
     const hasRole = (role) => {
-        return auth?.user?.role?.trim() === role.trim();
+        return auth?.user?.role === role;
     };
 
     const login = async (data) => {
@@ -15,12 +18,13 @@ const AuthProvider = ({ children }) => {
             const { data: response } = await axios.post("/auth/login", data);
 
             setAuth({
-                user: response.data.user,
-                accessToken: response.data.accessToken,
+                user: response.user,
+                accessToken: response.accessToken,
             });
-
+            console.log(response);
             return { status: response.status, message: response.message };
         } catch (error) {
+            console.log(error);
             const message =
                 error.response?.data?.message || "Došlo je do greške prilikom prijave!";
             throw new Error(message);
@@ -32,8 +36,8 @@ const AuthProvider = ({ children }) => {
             const { data: response } = await axios.post("/auth/register", data);
 
             setAuth({
-                user: response.data.user,
-                accessToken: response.data.accessToken,
+                user: response.user,
+                accessToken: response.accessToken,
             });
 
             return { status: response.status, message: response.message };
@@ -48,7 +52,12 @@ const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             const { data: response } = await axiosPrivate.post("/auth/logout");
-            setAuth({});
+            
+            setAuth({
+                user: null,
+                accessToken: null,
+            });
+
             return { status: response.status, message: response.message };
         } catch (error) {
             console.log(error);
@@ -65,8 +74,8 @@ const AuthProvider = ({ children }) => {
             });
 
             setAuth({
-                user: response.data.user,
-                accessToken: response.data.accessToken,
+                user: response.user,
+                accessToken: response.accessToken,
             });
         } catch (error) {
             const message =
@@ -81,7 +90,10 @@ const AuthProvider = ({ children }) => {
             try {
                 await refresh();
             } catch (error) {
-                setAuth({});
+                setAuth({
+                    user: null,
+                    accessToken: null,
+                });
             } finally {
                 setLoading(false);
             }
