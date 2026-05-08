@@ -46,4 +46,26 @@ const doesSubjectExists = async (name, code) => {
     }
 };
 
-export { createSubject, getAllSubjects };
+const getSubjectById = async (id) => {
+    try {
+        const subject = await prisma.subjects.findUnique({  
+            where: { id },
+            include: {
+                professor: {
+                    select: {
+                        first_name: true,
+                        last_name: true
+                    }
+                }
+            }
+        });
+
+        if (!subject) throw new Error("Predmet ne postoji!");
+
+        return subject;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export { createSubject, getAllSubjects, getSubjectById };

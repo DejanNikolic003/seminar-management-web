@@ -5,5 +5,6 @@ const subjectRouter = Router();
 
 subjectRouter.post("/", controller.createSubject);
 subjectRouter.get("/", controller.getAllSubjects);
+subjectRouter.get("/:id", controller.getSubjectById);
 
 export default subjectRouter;
