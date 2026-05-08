@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 
 const SubjectCard = ({ subject, colorIndex = 0 }) => {
   const bannerColor = GRADIENT_COLORS[colorIndex % GRADIENT_COLORS.length];
-  const teacherName = subject?.teacher
-    ? `${subject.teacher.firstName} ${subject.teacher.lastName}`
+  const professorName = subject?.professor
+    ? `${subject.professor.first_name} ${subject.professor.last_name}`
     : "";
   return (
     <Link to={`/subjects/${subject.id}`}>
@@ -17,11 +17,11 @@ const SubjectCard = ({ subject, colorIndex = 0 }) => {
         </div>
         <div className="p-4">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {subject.code}
+            Kod: {subject.code}
           </p>
           <div className="mt-2 flex items-center gap-2 text-slate-600">
             <User size={14} className="text-slate-400 shrink-0" />
-            <span className="text-sm truncate">{teacherName}</span>
+            <span className="text-sm truncate">{professorName}</span>
           </div>
         </div>
       </div>
