@@ -78,3 +78,19 @@ export const refresh = async (req, res) => {
         return res.status(500).json({ status: "error", message: error.message });
     }
 };
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie("refreshToken", { 
+            httpOnly: true, 
+            sameSite: 'Strict',
+        });
+
+        res.status(200).json({ 
+            status: "success", 
+            message: "Uspešno ste se odjavili!" 
+        });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
+    }
+};
