@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
 
             setAuth({
                 user: response.user,
-                accessToken: response.accessToken,
+                accessToken: response.token,
             });
             console.log(response);
             return { status: response.status, message: response.message };
@@ -37,7 +37,7 @@ const AuthProvider = ({ children }) => {
 
             setAuth({
                 user: response.user,
-                accessToken: response.accessToken,
+                accessToken: response.token,
             });
 
             return { status: response.status, message: response.message };
@@ -72,10 +72,9 @@ const AuthProvider = ({ children }) => {
             const { data: response } = await axios.get("/auth/refresh", {
                 withCredentials: true,
             });
-
             setAuth({
                 user: response.user,
-                accessToken: response.accessToken,
+                accessToken: response.token,
             });
         } catch (error) {
             const message =
