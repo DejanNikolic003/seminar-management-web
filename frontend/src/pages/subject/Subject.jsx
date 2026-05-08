@@ -126,15 +126,6 @@ const Subject = () => {
         setTopicDescription("");
     };
 
-    const refreshTopicsAndSeminars = async () => {
-        const [topicsResult, seminarsResult] = await Promise.all([
-            fetchTopicsBySubject(id),
-            fetchSeminarsBySubject(id),
-        ]);
-        setTopics(topicsResult);
-        setSeminars(seminarsResult);
-    };
-
     const handleSaveTopic = async (e) => {
         e.preventDefault();
         setError("");
@@ -152,7 +143,12 @@ const Subject = () => {
                 : await createTopic(id, topicName.trim(), topicDescription.trim());
 
             setSuccess(response.message || "Tema je uspešno sačuvana.");
-            await refreshTopicsAndSeminars();
+            const [topicsResult, seminarsResult] = await Promise.all([
+                fetchTopicsBySubject(id),
+                fetchSeminarsBySubject(id),
+            ]);
+            setTopics(topicsResult);
+            setSeminars(seminarsResult);
             closeTopicModal();
         } catch (err) {
             setError(err.message);
@@ -168,7 +164,12 @@ const Subject = () => {
         try {
             const response = await deleteTopic(topicId);
             setSuccess(response.message || "Tema je uspešno obrisana.");
-            await refreshTopicsAndSeminars();
+            const [topicsResult, seminarsResult] = await Promise.all([
+                fetchTopicsBySubject(id),
+                fetchSeminarsBySubject(id),
+            ]);
+            setTopics(topicsResult);
+            setSeminars(seminarsResult);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -183,7 +184,12 @@ const Subject = () => {
         try {
             const response = await reserveTopic(topicId, id);
             setSuccess(response.message || "Tema je uspešno rezervisana.");
-            await refreshTopicsAndSeminars();
+            const [topicsResult, seminarsResult] = await Promise.all([
+                fetchTopicsBySubject(id),
+                fetchSeminarsBySubject(id),
+            ]);
+            setTopics(topicsResult);
+            setSeminars(seminarsResult);
         } catch (err) {
             setError(err.message);
         } finally {
