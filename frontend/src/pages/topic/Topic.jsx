@@ -9,12 +9,13 @@ import ButtonWithIcon from "../../components/ButtonWithIcon";
 import Divider from "../../components/Divider";
 import SeminarStatusBadge from "./components/SeminarStatusBadge";
 import { FileUp, Save } from "lucide-react";
+import Input from "../../components/Input.jsx";
 
-const SEMINAR_STATUSES = ["DRAFT", "SUBMITTED", "APPROVED", "DEFENDED"];
+const SEMINAR_STATUSES = ["RESERVISAN", "PREDAT", "ODBRANJEN", "ODBIJEN"];
 
 const Topic = () => {
     const { subjectId, topicId } = useParams();
-    const { hasRole } = useAuth();
+    const { hasRole, auth } = useAuth();
     const { fetchSubject } = useSubjects();
     const { fetchTopicsBySubject } = useTopics();
     const { fetchSeminarByTopic, uploadSeminarPaper, updateSeminarStatus } = useSeminars();
@@ -22,8 +23,8 @@ const Topic = () => {
     const [subject, setSubject] = useState(null);
     const [topic, setTopic] = useState(null);
     const [seminar, setSeminar] = useState(null);
-    const [file, setFile] = useState(null);
-    const [status, setStatus] = useState("DRAFT");
+    const [file, setFile] = useState("");
+    const [status, setStatus] = useState("PREDAT");
     const [loading, setLoading] = useState(true);
     const [uploadLoading, setUploadLoading] = useState(false);
     const [statusLoading, setStatusLoading] = useState(false);
@@ -31,7 +32,8 @@ const Topic = () => {
     const [success, setSuccess] = useState("");
 
     const isStudent = hasRole("STUDENT");
-    const isProfessorOrAdmin = hasRole("PROFESSOR") || hasRole("ADMIN");
+    const isProfessorOrAdmin = (hasRole("PROFESSOR") && subject?.professor_id === auth?.user?.id) || hasRole("ADMIN");
+
 
     const loadData = async () => {
         setLoading(true);
@@ -41,6 +43,8 @@ const Topic = () => {
             const seminarResult = await fetchSeminarByTopic(topicId);
             const topicResult = topicsResult.find(currentTopic => currentTopic.id === Number(topicId));
 
+         
+
             setSubject(subjectResult);
             setTopic(topicResult || null);
             setSeminar(seminarResult);
@@ -49,6 +53,7 @@ const Topic = () => {
             setError(err.message);
         } finally {
             setLoading(false);
+    
         }
     };
 
@@ -61,10 +66,9 @@ const Topic = () => {
         setError("");
         setSuccess("");
 
-        console.log(file);
 
         if (!file) {
-            setError("Fajl seminarskog rada je obavezan.");
+            setError("Link seminarskog rada je obavezan.");
             return;
         }
 
@@ -72,7 +76,7 @@ const Topic = () => {
         try {
             const response = await uploadSeminarPaper(topicId, file);
             setSuccess(response.message || "Rad je uspešno postavljen.");
-            setFile(null);
+            setFile("");
             await loadData();
         } catch (err) {
             setError(err.message);
@@ -114,11 +118,11 @@ const Topic = () => {
             {loading ? (
                 <p className="text-sm text-slate-500">Učitavanje...</p>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-2">
                     <div className="rounded-lg border border-slate-200 p-4">
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-slate-600">Trenutni status seminarskog rada</p>
-                            <SeminarStatusBadge status={seminar?.status || "DRAFT"} />
+                            <SeminarStatusBadge status={seminar?.status || "NEMA"} />
                         </div>
                         {!seminar && (
                             <p className="mt-2 text-sm text-slate-500">
@@ -128,33 +132,44 @@ const Topic = () => {
                     </div>
 
                     {isStudent && (
-                        <form onSubmit={handleUpload} className="rounded-lg border border-slate-200 p-4" encType="multipart/form-data">
-                            <h3 className="mb-3 text-sm font-semibold text-slate-800">Postavi seminarski rad</h3>
-                            <label className="mb-3 flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 p-2 text-sm text-slate-600 hover:bg-slate-50">
-                                <FileUp size={16} />
-                                <span>{file?.name || "Izaberite fajl seminarskog rada"}</span>
-                                <input
-                                    type="file"
-                                    className="hidden"
-                                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                />
-                            </label>
-                            {seminar?.file_path && (
-                                <a
-                                    href={`${API_ORIGIN}${seminar.file_path}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="mb-3 inline-block text-xs text-cyan-700 underline"
-                                >
-                                    Trenutno postavljen rad
-                                </a>
-                            )}
-                            <ButtonWithIcon icon={<Save />} onClick={handleUpload} loading={uploadLoading}>
-                                Sačuvaj rad
-                            </ButtonWithIcon>
-                        </form>
-                    )}
+                    <form
+                        className="rounded-lg border border-slate-200 p-4"
+                    >
+                        <h3 className="mb-3 text-sm font-semibold text-slate-800">
+                            Postavi seminarski rad
+                        </h3>
 
+                        <div className="mb-3">
+                            <Input
+                                type="url"
+                                placeholder="Link seminarskog rada"
+                                value={file}
+                                icon={<FileUp />}
+                                onChange={(e) => setFile(e.target.value)}
+                            />
+                        </div>
+
+                        {seminar?.file_path && (
+                            <a
+                                href={seminar.file_path}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mb-3 inline-block text-xs text-cyan-700 underline"
+                            >
+                                Trenutno postavljen rad
+                            </a>
+                        )}
+
+                        <ButtonWithIcon
+                            type="submit"
+                            icon={<Save />}
+                            loading={uploadLoading}
+                            onClick={handleUpload}
+                        >
+                            Sačuvaj rad
+                        </ButtonWithIcon>
+                    </form>
+                )}
                     {isProfessorOrAdmin && seminar && (
                         <div className="rounded-lg border border-slate-200 p-4">
                             <h3 className="mb-3 text-sm font-semibold text-slate-800">Promena statusa</h3>

@@ -161,7 +161,7 @@ const reserveTopic = async (topicId, userId, subjectId, role) => {
         user_id: userId,
         subject_id: subjectId,
         topic_id: topicId,
-        status: "DRAFT",
+        status: "RESERVED",
       },
     });
 

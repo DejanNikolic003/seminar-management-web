@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 import isAuthenticated from "./middleware/isAuthenticated.js";
 import authRouter from "./routes/authRoutes.js";
 import subjectRouter from "./routes/subjectRoutes.js";
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());    
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api/auth", authRouter);
 app.use(isAuthenticated);
