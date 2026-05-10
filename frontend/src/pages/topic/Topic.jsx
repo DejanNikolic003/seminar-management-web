@@ -11,8 +11,13 @@ import SeminarStatusBadge from "./components/SeminarStatusBadge";
 import { FileUp, Save } from "lucide-react";
 import Input from "../../components/Input.jsx";
 
-const SEMINAR_STATUSES = ["RESERVISAN", "PREDAT", "ODBRANJEN", "ODBIJEN"];
 
+const STATUSES = {
+    RESERVED: "RESERVISAN",
+    SUBMITTED: "PREDAT",
+    DEFENDED: "ODBRANJEN",
+    DECLINED: "ODBIJEN",
+}
 const Topic = () => {
     const { subjectId, topicId } = useParams();
     const { hasRole, auth } = useAuth();
@@ -42,7 +47,6 @@ const Topic = () => {
             const topicsResult = await fetchTopicsBySubject(subjectId);
             const seminarResult = await fetchSeminarByTopic(topicId);
             const topicResult = topicsResult.find(currentTopic => currentTopic.id === Number(topicId));
-
          
 
             setSubject(subjectResult);
@@ -122,13 +126,24 @@ const Topic = () => {
                     <div className="rounded-lg border border-slate-200 p-4">
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-slate-600">Trenutni status seminarskog rada</p>
-                            <SeminarStatusBadge status={seminar?.status || "NEMA"} />
+                            <SeminarStatusBadge status={seminar?.status || "-"} />
                         </div>
                         {!seminar && (
                             <p className="mt-2 text-sm text-slate-500">
                                 Tema još nije rezervisana, pa ne postoji seminarski rad.
                             </p>
                         )}
+
+                        {seminar?.file_path ? (
+                            <a
+                                href={seminar.file_path}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mb-3 inline-block text-xs text-cyan-700 underline"
+                            >
+                               Link do seminarskog rada
+                            </a>
+                        ) : null }
                     </div>
 
                     {isStudent && (
@@ -178,9 +193,9 @@ const Topic = () => {
                                 onChange={(e) => setStatus(e.target.value)}
                                 className="mb-3 w-full rounded-lg border border-slate-200 p-2 text-sm text-slate-700 outline-none"
                             >
-                                {SEMINAR_STATUSES.map((statusOption) => (
-                                    <option key={statusOption} value={statusOption}>
-                                        {statusOption}
+                                {Object.entries(STATUSES).map(([key, value]) => (
+                                    <option key={key} value={key}>
+                                        {value}
                                     </option>
                                 ))}
                             </select>
