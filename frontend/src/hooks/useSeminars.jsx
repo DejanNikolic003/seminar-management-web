@@ -29,13 +29,9 @@ const useSeminars = () => {
 
     const uploadSeminarPaper = async (topicId, file) => {
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-
-
-            const { data: response } = await axiosPrivate.put(
+            const { data: response } = await axiosPrivate.post(
                 `/seminars/topic/${topicId}/upload`,
-                formData
+                { filePath: file },
             );
             return response;
         } catch (error) {
