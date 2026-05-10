@@ -10,8 +10,16 @@ const useSubjects = () => {
         setLoading(true);
         try {
             const { data: response } = await axiosPrivate.get(`/enrollments`);
-            console.log(response.subjects);
-            setSubjects(response.subjects);
+            const { data: subjectsResponse } = await axiosPrivate.get(`/subjects`);
+
+            const subjectsMap = new Map();
+            [...response.subjects, ...subjectsResponse.subjects].forEach(subject => {
+                subjectsMap.set(subject.id, subject);
+            });
+
+            const subjects = Array.from(subjectsMap.values());
+
+            setSubjects(subjects);
         } catch (error) {
             const message =
                 error.response?.data?.message ||
