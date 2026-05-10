@@ -1,5 +1,6 @@
 import { prisma } from "../config/prismaClient.js";
-import { doesUserExistsById, isProfessor } from "./authService.js";
+import { doesUserExistsById } from "./authService.js";
+import { ADMIN, PROFESSOR, STUDENT } from "../constants/roles.js";
 
 const createSeminar = async (userId, subjectId, topicId, filePath) => {
   try {
@@ -64,19 +65,28 @@ const getSeminarsBySubject = async (subjectId) => {
   }
 };
 
-const updateSeminarStatus = async (seminarId, status, professorId) => {
+const getSeminarByTopic = async (topicId) => {
   try {
-    const professor = await doesUserExistsById(professorId);
-    if (!professor) throw new Error("Korisnik ne postoji!");
-    if (!isProfessor(professor)) throw new Error("Korisnik nije profesor!");
-
-    const allowedStatuses = ["DRAFT", "SUBMITTED", "APPROVED", "DEFENDED"];
-    if (!allowedStatuses.includes(status))
-      throw new Error("Status nije validan!");
-
-    const seminar = await prisma.seminars.update({
-      where: { id: seminarId },
-      data: { status },
+    const seminar = await prisma.seminars.findFirst({
+      where: { topic_id: topicId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+          },
+        },
+        topic: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            subject_id: true,
+          },
+        },
+      },
     });
 
     return seminar;
@@ -85,5 +95,70 @@ const updateSeminarStatus = async (seminarId, status, professorId) => {
   }
 };
 
-export { createSeminar, getSeminarsBySubject, updateSeminarStatus };
+const uploadSeminarPaper = async (topicId, userId, role, filePath) => {
+  try {
+    if (role !== STUDENT) {
+      throw new Error("Samo studenti mogu da postave seminarski rad!");
+    }
+    console.log(filePath);
+    if (!filePath) {
+      throw new Error("Fajl seminarskog rada je obavezan!");
+    }
+
+    const seminar = await prisma.seminars.findFirst({
+      where: { topic_id: topicId, user_id: userId },
+    });
+
+    if (!seminar) {
+      throw new Error("Niste rezervisali ovu temu!");
+    }
+
+    const updatedSeminar = await prisma.seminars.update({
+      where: { id: seminar.id },
+      data: {
+        file_path: filePath,
+        status: "SUBMITTED",
+      },
+    });
+
+    return updatedSeminar;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateSeminarStatusByRole = async (seminarId, status, userId, role) => {
+  try {
+    if (![PROFESSOR, ADMIN].includes(role)) {
+      throw new Error("Nemate dozvolu da menjate status seminara!");
+    }
+
+    const allowedStatuses = ["RESERVED", "SUBMITTED", "APPROVED", "DEFENDED"];
+    if (!allowedStatuses.includes(status)) {
+      throw new Error("Status nije validan!");
+    }
+
+    const seminar = await prisma.seminars.findUnique({ where: { id: seminarId } });
+    if (!seminar) throw new Error("Seminarski rad ne postoji!");
+
+    if (role === PROFESSOR) {
+      const subject = await prisma.subjects.findUnique({
+        where: { id: seminar.subject_id },
+      });
+      if (!subject) throw new Error("Predmet ne postoji!");
+      if (subject.professor_id !== userId) {
+        throw new Error("Nemate dozvolu da menjate status za ovaj predmet!");
+      }
+    }
+
+    return prisma.seminars.update({
+      where: { id: seminarId },
+      data: { status },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { createSeminar, getSeminarsBySubject, getSeminarByTopic, uploadSeminarPaper, updateSeminarStatusByRole };
 

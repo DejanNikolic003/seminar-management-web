@@ -18,6 +18,22 @@ const createSubject = async (name, code, professorId) => {
   } 
 };
 
+const getSubjectsByProfessorId = async (professorId) => {
+  return prisma.subjects.findMany({
+    where: {
+      professor_id: professorId,
+    },
+    include: {
+        professor: {
+            select: {
+                first_name: true,
+                last_name: true
+            }
+        }
+    }
+  });
+};
+
 const getAllSubjects = async () => {
     try {
         const subjects = await prisma.subjects.findMany({
@@ -68,4 +84,4 @@ const getSubjectById = async (id) => {
     }
 };
 
-export { createSubject, getAllSubjects, getSubjectById };
+export { createSubject, getAllSubjects, getSubjectById, getSubjectsByProfessorId };

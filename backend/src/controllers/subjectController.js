@@ -39,6 +39,7 @@ const getSubjectById = async (req, res) => {
             id: subject.id,
             name: subject.name,
             code: subject.code,
+            professor_id: subject.professor_id,
             professor: {
                 first_name: subject.professor.first_name,
                 last_name: subject.professor.last_name
@@ -50,4 +51,15 @@ const getSubjectById = async (req, res) => {
     }  
 };
 
-export { createSubject, getAllSubjects, getSubjectById };
+const getSubjectsByProfessorId = async (req, res) => {
+    try {
+        const userId = Number(req.user.id);
+        const subjects = await service.getSubjectsByProfessorId(userId);
+
+        return res.status(200).json({ subjects });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export { createSubject, getAllSubjects, getSubjectById, getSubjectsByProfessorId };
