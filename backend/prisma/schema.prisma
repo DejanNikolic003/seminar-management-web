@@ -74,8 +74,8 @@ enum Role {
 }
 
 enum SeminarStatus {
-  DRAFT
+  RESERVED
   SUBMITTED
-  APPROVED
   DEFENDED
+  DECLINED
 }
