@@ -26,8 +26,7 @@ const TopicsList = ({
             {topics.map((topic) => {
                 const occupiedSeminar = seminarsByTopicId[topic.id];
                 const isOccupied = !!occupiedSeminar;
-                const reservedByMe = occupiedSeminar?.user_id === auth?.user?.id;
-
+               
                 return (
                     <div key={topic.id} className="rounded-lg border border-slate-200 p-4">
                         <div className="flex items-start justify-between gap-3">
