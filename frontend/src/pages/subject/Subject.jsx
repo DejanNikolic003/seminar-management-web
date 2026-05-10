@@ -1,26 +1,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useSubjects from "../../hooks/useSubjects";
+import useTopics from "../../hooks/useTopics";
+import useSeminars from "../../hooks/useSeminars";
 import Info from "./components/Info";
 import Divider from "../../components/Divider";
-import ButtonWithIcon from "../../components/ButtonWithIcon";
-import Input from "../../components/Input";
 import Alert from "../../components/Alert";
 import useAuth from "../../hooks/useAuth";
-import { BookOpenText, Mail, Pencil, Plus, Trash2, X } from "lucide-react";
+import { BookOpenText, Plus } from "lucide-react";
+import TopicsList from "./components/TopicsList";
+import AddStudentModal from "./components/AddStudentModal";
+import TopicModal from "./components/TopicModal";
 
 const Subject = () => {
     const { id } = useParams();
-    const {
-        fetchSubject,
-        enrollStudentByEmail,
-        fetchTopicsBySubject,
-        createTopic,
-        updateTopic,
-        deleteTopic,
-        reserveTopic,
-        fetchSeminarsBySubject,
-    } = useSubjects();
+    const { fetchSubject, enrollStudentByEmail } = useSubjects();
+    const { fetchTopicsBySubject, createTopic, updateTopic, deleteTopic, reserveTopic } = useTopics();
+    const { fetchSeminarsBySubject } = useSeminars();
     const { hasRole, auth } = useAuth();
     const [subject, setSubject] = useState(null); 
     const [topics, setTopics] = useState([]);
@@ -240,137 +236,41 @@ const Subject = () => {
                         Trenutno nema dostupnih tema.
                     </p>
                 ) : (
-                    <div className="space-y-3">
-                        {topics.map((topic) => {
-                            const occupiedSeminar = seminarsByTopicId[topic.id];
-                            const isOccupied = !!occupiedSeminar;
-                            const reservedByMe = occupiedSeminar?.user_id === auth?.user?.id;
-
-                            return (
-                                <div key={topic.id} className="rounded-lg border border-slate-200 p-4">
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div>
-                                            <h4 className="font-medium text-slate-800">{topic.name}</h4>
-                                            {topic.description && (
-                                                <p className="mt-1 text-sm text-slate-600">{topic.description}</p>
-                                            )}
-                                            <p className="mt-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                                                {isOccupied
-                                                    ? `Zauzeta${reservedByMe ? " (rezervisali ste vi)" : ""}`
-                                                    : "Slobodna"}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            {isProfessorOrAdmin && (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => openEditTopicModal(topic)}
-                                                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
-                                                    >
-                                                        <Pencil size={14} />
-                                                        Izmeni
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDeleteTopic(topic.id)}
-                                                        disabled={actionLoadingTopicId === topic.id}
-                                                        className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50 disabled:opacity-60"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                        Obriši
-                                                    </button>
-                                                </>
-                                            )}
-
-                                            {isStudent && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleReserveTopic(topic.id)}
-                                                    disabled={isOccupied || actionLoadingTopicId === topic.id}
-                                                    className="rounded-md bg-cyan-500 px-3 py-1 text-xs font-medium text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-                                                >
-                                                    Rezerviši
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                    <TopicsList
+                        topics={topics}
+                        seminarsByTopicId={seminarsByTopicId}
+                        isProfessorOrAdmin={isProfessorOrAdmin}
+                        isStudent={isStudent}
+                        auth={auth}
+                        actionLoadingTopicId={actionLoadingTopicId}
+                        subjectId={id}
+                        onEditTopic={openEditTopicModal}
+                        onDeleteTopic={handleDeleteTopic}
+                        onReserveTopic={handleReserveTopic}
+                    />
                 )}
             </div>
 
-            {isStudentModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-lg">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-slate-800">Dodavanje učenika</h3>
-                            <button
-                                type="button"
-                                onClick={closeStudentModal}
-                                className="rounded p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
+            <AddStudentModal
+                isOpen={isStudentModalOpen}
+                email={email}
+                loading={enrollLoading}
+                onClose={closeStudentModal}
+                onSubmit={handleEnrollStudent}
+                onEmailChange={setEmail}
+            />
 
-                        <form onSubmit={handleEnrollStudent}>
-                            <Input
-                                type="email"
-                                placeholder="Email studenta"
-                                icon={<Mail />}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                            <ButtonWithIcon icon={<Plus />} onClick={handleEnrollStudent} loading={enrollLoading}>
-                                Dodaj studenta
-                            </ButtonWithIcon>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {isTopicModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-lg">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-slate-800">
-                                {editingTopicId ? "Izmena teme" : "Dodavanje teme"}
-                            </h3>
-                            <button
-                                type="button"
-                                onClick={closeTopicModal}
-                                className="rounded p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSaveTopic}>
-                            <Input
-                                type="text"
-                                placeholder="Naziv teme"
-                                icon={<BookOpenText />}
-                                value={topicName}
-                                onChange={(e) => setTopicName(e.target.value)}
-                            />
-                            <Input
-                                type="text"
-                                placeholder="Opis teme (opciono)"
-                                icon={<Pencil />}
-                                value={topicDescription}
-                                onChange={(e) => setTopicDescription(e.target.value)}
-                            />
-                            <ButtonWithIcon icon={<Plus />} onClick={handleSaveTopic} loading={topicLoading}>
-                                {editingTopicId ? "Sačuvaj izmene" : "Dodaj temu"}
-                            </ButtonWithIcon>
-                        </form>
-                    </div>
-                </div>
-            )}
+            <TopicModal
+                isOpen={isTopicModalOpen}
+                editingTopicId={editingTopicId}
+                topicName={topicName}
+                topicDescription={topicDescription}
+                loading={topicLoading}
+                onClose={closeTopicModal}
+                onSubmit={handleSaveTopic}
+                onTopicNameChange={setTopicName}
+                onTopicDescriptionChange={setTopicDescription}
+            />
         </>
     );
 };
