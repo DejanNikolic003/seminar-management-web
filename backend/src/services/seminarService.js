@@ -133,7 +133,7 @@ const updateSeminarStatusByRole = async (seminarId, status, userId, role) => {
       throw new Error("Nemate dozvolu da menjate status seminara!");
     }
 
-    const allowedStatuses = ["RESERVED", "SUBMITTED", "APPROVED", "DEFENDED"];
+    const allowedStatuses = ["RESERVED", "SUBMITTED", "APPROVED", "DECLINED"];
     if (!allowedStatuses.includes(status)) {
       throw new Error("Status nije validan!");
     }
