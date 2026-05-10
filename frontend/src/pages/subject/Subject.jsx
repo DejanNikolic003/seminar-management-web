@@ -60,7 +60,8 @@ const Subject = () => {
        loadSubject();
     }, [id]);
 
-    const isProfessorOrAdmin = hasRole("PROFESSOR") || hasRole("ADMIN");
+    const isProfessorOrAdmin = (hasRole("PROFESSOR") && subject?.professor_id === auth?.user?.id) || hasRole("ADMIN");
+
     const isStudent = hasRole("STUDENT");
 
     const seminarsByTopicId = seminars.reduce((acc, seminar) => {
